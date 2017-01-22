@@ -110,7 +110,7 @@ class HelloYouThere():
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1
 
-            elif (self.now.hour < 21 or self.now.hour > 9):
+            elif (self.now.hour < 21 and self.now.hour > 9):
                self.searchWifi()
             else:
                 self.on = 1

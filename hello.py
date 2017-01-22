@@ -97,7 +97,7 @@ class HelloYouThere():
         while True:
             self.now = datetime.datetime.now().time()
 
-            if (self.now.hour > 21 and self.now.hour < 9) and self.on == 1:
+            if (self.now.hour > 21 or self.now.hour < 9) and self.on == 1:
                 self.on = 0
                 self.__logger__("%d:%d Turning off." % (self.now.hour, self.now.minute))
                 self.speak("Turning off. Good night household")
@@ -105,12 +105,12 @@ class HelloYouThere():
                 for i,addr in enumerate(self.addr):
                     self.addr[i][-1] = "0"
 
-            elif (self.now.hour < 21 and self.now.hour > 9) and self.on == 0:
+            elif (self.now.hour < 21 or self.now.hour > 9) and self.on == 0:
                 self.speak("Good morning") 
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1
 
-            elif (self.now.hour < 21 and self.now.hour > 9):
+            elif (self.now.hour < 21 or self.now.hour > 9):
                self.searchWifi()
             else:
                 self.on = 1

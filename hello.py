@@ -105,7 +105,7 @@ class HelloYouThere():
                 for i,addr in enumerate(self.addr):
                     self.addr[i][-1] = "0"
 
-            elif (self.now.hour < 21 or self.now.hour > 9) and self.on == 0:
+            elif (self.now.hour < 21 and self.now.hour > 9) and self.on == 0:
                 self.speak("Good morning") 
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1

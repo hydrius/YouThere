@@ -100,11 +100,13 @@ class HelloYouThere():
         while True:
             self.now = datetime.datetime.now().time()
 
-            if (self.now.hour > 21 or self.now.hour < 9) and self.on == 1:
+            if (self.now.hour >= 21 or self.now.hour <= 9 and self.now.minute == 40) and self.on == 1:
                 self.on = 0
                 self.__logger__("%d:%d Turning off." % (self.now.hour, self.now.minute))
-                #self.searchWifi()
-                self.speak("Turning off. Good night household")
+                self.searchWifi()
+                onlinestr = ''.join(self.online)
+                self.speak("You do not know me. Good night %s"  % onlinestr)
+
 
                 for i,addr in enumerate(self.addr):
                     self.addr[i][-1] = "0"
@@ -115,7 +117,7 @@ class HelloYouThere():
                     x = False
 
 
-            elif (self.now.hour < 21 and self.now.hour > 9) and self.on == 0:
+            elif (self.now.hour <= 21 and self.now.hour >= 9) and self.on == 0:
                 #self.speak("Good morning") 
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1
@@ -127,6 +129,7 @@ class HelloYouThere():
                     y = False
             else:
                 self.on = 1
+                print("ss")
 
 
     def loadaddr(self):

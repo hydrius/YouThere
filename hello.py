@@ -76,6 +76,7 @@ class HelloYouThere():
 
 
     def main(self):
+        self.online = []
         self.interval = 1
         self.pattern = [[1,0,1],
                         [1,0,0,1],
@@ -94,28 +95,36 @@ class HelloYouThere():
         self.devicesConnected = 0
 
         self.on = 0
+        x = True
+        y = True
         while True:
             self.now = datetime.datetime.now().time()
 
             if (self.now.hour > 21 or self.now.hour < 9) and self.on == 1:
                 self.on = 0
                 self.__logger__("%d:%d Turning off." % (self.now.hour, self.now.minute))
-                #self.speak("Turning off. Good night household")
+                #self.searchWifi()
+                self.speak("Turning off. Good night household")
 
                 for i,addr in enumerate(self.addr):
                     self.addr[i][-1] = "0"
 
-            elif self.now.hour > 12 or self.now.hour < 9: 
-                  print("Sleeping")
+            elif self.now.hour > 21 or self.now.hour < 9:
+                if x == True:
+                    print("Sleeping")
+                    x = False
+
 
             elif (self.now.hour < 21 and self.now.hour > 9) and self.on == 0:
                 #self.speak("Good morning") 
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1
 
-            elif (self.now.hour < 21 and self.now.hour > 9):
-               #self.searchWifi(
-               print("Searching")
+            elif (self.now.hour < 21 and self.now.hour > 9 and self.now.minute == 49):
+               #self.searchWifi()
+                if y == True:
+                    print("Searching")
+                    y = False
             else:
                 self.on = 1
 
@@ -169,7 +178,7 @@ class HelloYouThere():
     def searchWifi(self):
         i = 0
 
-        for  name, addr, status, history, num  in self.addr:
+        for name, addr, status, history, num  in self.addr:
             print(self.addr[i])
             p = subprocess.Popen("arp-scan -l | grep %s" % str(addr), stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
@@ -190,7 +199,8 @@ class HelloYouThere():
                 if not seq:
                     if num == "0":
                         self.__logger__("%s connected" % name)
-                        self.action(name)
+                        self.online.append(name)
+                        #self.action(name)
                         self.addr[i][4] = "1"
 
             elif output and status == "1":
@@ -198,6 +208,7 @@ class HelloYouThere():
 
             elif not output and status == "1":
                 self.__logger__("%s disconnected" % name)
+                self.online.remove(name)
                 self.addr[i][3] = [0] + history
                 self.addr[i][2] = "0"
                 self.devicesConnected -=1

@@ -59,8 +59,8 @@ class HelloYouThere():
     def __init__(self):
 
         pygame.init()
-        self.speak("System operational. Beep. boop. beep. boop.")
-        self.__logger__("System has started. Did you hear anything?")
+        #self.speak("System operational. Beep. boop. beep. boop.")
+        #self.__logger__("System has started. Did you hear anything?")
 
         self.addr = self.loadaddr()
 
@@ -100,18 +100,22 @@ class HelloYouThere():
             if (self.now.hour > 21 or self.now.hour < 9) and self.on == 1:
                 self.on = 0
                 self.__logger__("%d:%d Turning off." % (self.now.hour, self.now.minute))
-                self.speak("Turning off. Good night household")
+                #self.speak("Turning off. Good night household")
 
                 for i,addr in enumerate(self.addr):
                     self.addr[i][-1] = "0"
 
+            elif self.now.hour > 12 or self.now.hour < 9: 
+                  print("Sleeping")
+
             elif (self.now.hour < 21 and self.now.hour > 9) and self.on == 0:
-                self.speak("Good morning") 
+                #self.speak("Good morning") 
                 self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
                 self.on = 1
 
             elif (self.now.hour < 21 and self.now.hour > 9):
-               self.searchWifi()
+               #self.searchWifi(
+               print("Searching")
             else:
                 self.on = 1
 

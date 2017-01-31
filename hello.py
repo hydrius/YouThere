@@ -241,19 +241,21 @@ class HelloYouThere():
         if action == "speak":
             if name == "Master":
                 self.play("starwars.mp3")
-                self.speak("My Master has arrived.")
+                self.speak("My Master has arrived.", elapsed = 30000)
             elif name == "Susan":
-                self.play("funeral.mp3")
+                self.play("tardis.mp3")
             elif name == "Dave":
-                self.speak("Did you have a good time Dave?")
+                self.play("spanishFlea.mp3", elapsed = 30000)
+                #self.speak("Did you have a good time Dave?")
             elif name == "Sadie":
                 self.speak("Oh no.. Sadie is here.. This means it is sangria time.")
             elif name == "Greg":
+                self.play("petty.mp3")
                 self.speak("Greg. You. Don't. Know. Me.")
             elif name == "Aaron":
                 self.speak("Aaron. I have something to tell you. Godzilla is my patronus")
 
-    def play(self, files, elapsed=120000):
+    def play(self, files, elapsed=60000):
         pygame.mixer.music.load(files)
         last = pygame.time.get_ticks()
         pygame.mixer.music.play()

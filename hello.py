@@ -90,15 +90,13 @@ class HelloYouThere():
                         [1,0,0,0,0,0,0,0,0,0,0,1],
                         [1,0,0,0,0,0,0,0,0,0,0,0,1]]
 
-
-
         self.devicesConnected = 0
         self.on = 0
         self.x = True
         self.y = True
- 
 
-       
+
+
         while True:
             if self.time():
                 self.searchWifi()
@@ -111,8 +109,7 @@ class HelloYouThere():
             self.on = 0
             self.__logger__("%d:%2d Turning off." % (self.now.hour, self.now.minute))
             onlinestr = ''.join(self.online)
-            self.speak("You do not know me. Good night %s"  % onlinestr)
-
+            self.speak("Tamara signing off. Good night %s"  % onlinestr)
 
             for i, addr in enumerate(self.addr):
                 #resets for next day
@@ -120,23 +117,19 @@ class HelloYouThere():
 
         elif self.now.hour >= 21 or self.now.hour < 9:
             if self.x == True:
-                print("Sleeping")
+                self.__logger__("Sleeping")
                 self.x = False
-
 
         elif (self.now.hour < 21 and self.now.hour >= 9) and self.on == 0:
             self.__logger__("%d:%2d Turning on." % (self.now.hour, self.now.minute))
+            self.speak("Good Morning everyone")
             self.on = 1
 
         elif (self.now.hour < 21 and self.now.hour >= 9):
-            #self.searchWifi()
             if self.y == True:
-                print("Searching")
+                self.__logger__("Searching")
                 self.y = False
             return True
-
-        else:
-            self.on = 1
 
 
     def loadaddr(self):
@@ -196,6 +189,7 @@ class HelloYouThere():
             if output and status == "0":
 
                 self.devicesConnected +=1
+                self.online.append(name)
                 self.addr[i][2] = "1"
                 self.addr[i][3] = [1] + history
 
@@ -207,9 +201,8 @@ class HelloYouThere():
                         self.__logger__("pattern exists")
                         break
                 if not seq:
-                    if num == "0": #or (datetime.datetime.combine(time) - datetime.datetime.combine(self.now)).total_seconds() > 3600:
-                        self.__logger__("%s connected" % name)
-                        self.online.append(name)
+                    if num == "0" or (datetime.datetime.combine(datetime.date.min, self.now) - datetime.datetime.combine(datetime.date.min, time)).total_seconds() > 1800:
+                        self.__logger__("%s connected" % name) 
                         self.addr[i][5] = self.now
                         self.action(name)
                         self.addr[i][4] = "1"
@@ -244,20 +237,31 @@ class HelloYouThere():
             print("Motion detected")
             sleep(2)
 
-    def action(self, name):
+    def action(self, name, action="speak"):
+        if action == "speak":
+            if name == "Master":
+                self.play("starwars.mp3")
+                self.speak("My Master has arrived.")
+            elif name == "Susan":
+                self.play("funeral.mp3")
+            elif name == "Dave":
+                self.speak("Did you have a good time Dave?")
+            elif name == "Sadie":
+                self.speak("Oh no.. Sadie is here.. This means it is sangria time.")
+            elif name == "Greg":
+                self.speak("Greg. You. Don't. Know. Me.")
+            elif name == "Aaron":
+                self.speak("Aaron. I have something to tell you. Godzilla is my patronus")
 
-        if name == "Master":
-            self.speak("My Master has arrived.")
-        elif name == "Susan":
-            self.speak("Susan. Hi")
-        elif name == "Dave":
-            self.speak("behave Dave")
-        elif name == "Sadie":
-            self.speak("Don't worry Sadie, I get migranes too on birth control")
-        elif name == "Greg":
-            self.speak("Greg. You do not. Know. Me.")
-        elif name == "Aaron":
-            self.speak("Aaron. I have something to tell you. Godzilla is my patronus")
+    def play(self, files, elapsed=120000):
+        pygame.mixer.music.load(files)
+        last = pygame.time.get_ticks()
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy():
+            now = pygame.time.get_ticks()
+            if (now - last) > elapsed:
+                pygame.mixer.music.stop()
+
 
 
     def speak(self, string):

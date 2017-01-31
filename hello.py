@@ -93,43 +93,50 @@ class HelloYouThere():
 
 
         self.devicesConnected = 0
-
         self.on = 0
-        x = True
-        y = True
+        self.x = True
+        self.y = True
+ 
+
+       
         while True:
-            self.now = datetime.datetime.now().time()
-
-            if (self.now.hour >= 21 or self.now.hour <= 9 and self.now.minute == 40) and self.on == 1:
-                self.on = 0
-                self.__logger__("%d:%d Turning off." % (self.now.hour, self.now.minute))
+            if self.time():
                 self.searchWifi()
-                onlinestr = ''.join(self.online)
-                self.speak("You do not know me. Good night %s"  % onlinestr)
+
+    def time(self):
+        self.now = datetime.datetime.now().time()
+
+        # If out of hours.
+        if (self.now.hour >= 21 or self.now.hour < 9) and self.on == 1:
+            self.on = 0
+            self.__logger__("%d:%2d Turning off." % (self.now.hour, self.now.minute))
+            onlinestr = ''.join(self.online)
+            self.speak("You do not know me. Good night %s"  % onlinestr)
 
 
-                for i,addr in enumerate(self.addr):
-                    self.addr[i][-1] = "0"
+            for i, addr in enumerate(self.addr):
+                #resets for next day
+                self.addr[i][-2] = "0"
 
-            elif self.now.hour > 21 or self.now.hour < 9:
-                if x == True:
-                    print("Sleeping")
-                    x = False
+        elif self.now.hour >= 21 or self.now.hour < 9:
+            if self.x == True:
+                print("Sleeping")
+                self.x = False
 
 
-            elif (self.now.hour <= 21 and self.now.hour >= 9) and self.on == 0:
-                #self.speak("Good morning") 
-                self.__logger__("%d:%d Turning on." % (self.now.hour, self.now.minute))
-                self.on = 1
+        elif (self.now.hour < 21 and self.now.hour >= 9) and self.on == 0:
+            self.__logger__("%d:%2d Turning on." % (self.now.hour, self.now.minute))
+            self.on = 1
 
-            elif (self.now.hour < 21 and self.now.hour > 9):
-               #self.searchWifi()
-                if y == True:
-                    print("Searching")
-                    y = False
-            else:
-                self.on = 1
-                print("ss")
+        elif (self.now.hour < 21 and self.now.hour >= 9):
+            #self.searchWifi()
+            if self.y == True:
+                print("Searching")
+                self.y = False
+            return True
+
+        else:
+            self.on = 1
 
 
     def loadaddr(self):
@@ -139,7 +146,7 @@ class HelloYouThere():
            for line in temp:
                addr.append(line.split())
                for i, element in enumerate(addr):
-                   addr[i][-2] = []
+                   addr[i][-3] = []
        return addr 
 
     @staticmethod
@@ -181,7 +188,7 @@ class HelloYouThere():
     def searchWifi(self):
         i = 0
 
-        for name, addr, status, history, num  in self.addr:
+        for name, addr, status, history, num, time  in self.addr:
             print(self.addr[i])
             p = subprocess.Popen("arp-scan -l | grep %s" % str(addr), stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
@@ -200,10 +207,11 @@ class HelloYouThere():
                         self.__logger__("pattern exists")
                         break
                 if not seq:
-                    if num == "0":
+                    if num == "0": #or (datetime.datetime.combine(time) - datetime.datetime.combine(self.now)).total_seconds() > 3600:
                         self.__logger__("%s connected" % name)
                         self.online.append(name)
-                        #self.action(name)
+                        self.addr[i][5] = self.now
+                        self.action(name)
                         self.addr[i][4] = "1"
 
             elif output and status == "1":
@@ -211,7 +219,10 @@ class HelloYouThere():
 
             elif not output and status == "1":
                 self.__logger__("%s disconnected" % name)
-                self.online.remove(name)
+                try:
+                    self.online.remove(name)
+                except:
+                    pass
                 self.addr[i][3] = [0] + history
                 self.addr[i][2] = "0"
                 self.devicesConnected -=1
@@ -235,16 +246,18 @@ class HelloYouThere():
 
     def action(self, name):
 
-        if name == "Aaron":
-            self.speak("Where is my master?")
+        if name == "Master":
+            self.speak("My Master has arrived.")
         elif name == "Susan":
-            self.speak("I love you Susan")
+            self.speak("Susan. Hi")
         elif name == "Dave":
             self.speak("behave Dave")
         elif name == "Sadie":
             self.speak("Don't worry Sadie, I get migranes too on birth control")
         elif name == "Greg":
-            self.speak("Greg. I want your curls")
+            self.speak("Greg. You do not. Know. Me.")
+        elif name == "Aaron":
+            self.speak("Aaron. I have something to tell you. Godzilla is my patronus")
 
 
     def speak(self, string):

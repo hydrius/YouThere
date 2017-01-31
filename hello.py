@@ -240,8 +240,8 @@ class HelloYouThere():
     def action(self, name, action="speak"):
         if action == "speak":
             if name == "Master":
-                self.play("starwars.mp3")
-                self.speak("My Master has arrived.", elapsed = 30000)
+                self.play("starwars.mp3", elapsed = 30000)
+                self.speak("My Master has arrived.")
             elif name == "Susan":
                 self.play("tardis.mp3")
             elif name == "Dave":
